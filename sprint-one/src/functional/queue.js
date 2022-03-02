@@ -3,36 +3,28 @@ var Queue = function() {
 
   // Use an object with numeric keys to store values
   var storage = {};
+  storage.size = 0;
 
   someInstance.enqueue = function(value) {
-    if (someInstance.size() === 0) {
-      storage[0] = value;
-    } else {
-      var end = someInstance.size();
-      storage[end] = value;
-    }
+    storage[someInstance.size()] = value;
+    storage.size++;
   };
 
   someInstance.dequeue = function() {
-    var last = someInstance.size() - 1;
     var output = storage[0];
-    delete storage[0];
-    for (var i = 0; i < someInstance.size(); i++) {
+    for (var i = 0; i < storage.size; i++) {
       storage[i] = storage[i + 1];
     }
-    delete storage[last];
+    storage.size--;
+    if (storage.size < 0) {
+      storage.size = 0;
+    }
+    delete storage[storage.size];
     return output;
   };
 
   someInstance.size = function() {
-    if (Object.keys(storage).length > 0) {
-      var keys = Object.keys(storage);
-      keys = keys.map(Number);
-      var last = Math.max(...keys);
-      return ++last;
-    } else {
-      return 0;
-    }
+    return storage.size;
   };
 
   return someInstance;
