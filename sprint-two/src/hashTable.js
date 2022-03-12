@@ -14,21 +14,21 @@ HashTable.prototype.insert = function(k, v) {
   // create key/value arrays if it doesn't already exist
   var keyValue = [k, v];
   var outerArray = this._storage.get(index);
+
   if (outerArray === undefined) {
-    this._storage.set(index, [[keyValue]]);
+    this._storage.set(index, [keyValue]);
   } else {
     var exists = false;
 
     for (var i = 0; i < outerArray.length; i++) {
-      outerArray[i].forEach(function(innerArray) {
-        if (innerArray.at(0) === k) {
-          exists = true;
-          innerArray[1] = v;
-        }
-      });
+      var innerArray = outerArray[i];
+      if (innerArray.at(0) === k) {
+        exists = true;
+        innerArray[1] = v;
+      }
     }
     if (!exists) {
-      outerArray.push([keyValue]);
+      outerArray.push(keyValue);
     }
     this._storage.set(index, outerArray);
   }
@@ -36,15 +36,16 @@ HashTable.prototype.insert = function(k, v) {
 
 HashTable.prototype.retrieve = function(k) {
   var index = getIndexBelowMaxForKey(k, this._limit);
-  var keyValueIndex = this._storage.get(index);
+  var outerArray = this._storage.get(index);
   var result;
 
-  for (var i = 0; i < keyValueIndex.length; i++) {
-    keyValueIndex[i].forEach(function(elem) {
-      if (elem.at(0) === k) {
-        result = elem.at(1);
-      }
-    });
+  for (var i = 0; i < outerArray.length; i++) {
+    var innerArray = outerArray[i];
+
+    if (innerArray[0] === k) {
+      result = innerArray[1];
+    }
+
   }
 
   return result;
@@ -52,28 +53,30 @@ HashTable.prototype.retrieve = function(k) {
 
 HashTable.prototype.remove = function(k) {
   var index = getIndexBelowMaxForKey(k, this._limit);
-  var count = 0;
+  var outterArray = this._storage.get(index);
 
-  var keyValuePairArray = this._storage.get(index);
-
-  var cb = function(value, count, collection) {
-
-    if (collection.at(0) === value) {
-      // will need to handle nested array
-      collection.splice(count, 2);
+  var cb = function(key, collection) {
+    for (var i = 0; i < collection.length; i++) {
+      if (collection[i].at(0) === key) {
+        collection.splice(i, 1);
+      }
     }
   };
 
   this._storage.each(function () {
-    cb(k, count, keyValuePairArray);
-    count++;
+    cb(k, outterArray);
   });
+
+  this._storage.set(index, outterArray);
 };
 
 
 
 /*
  * Complexity: What is the time complexity of the above functions?
+    insert: O(1) on average, O(n) as worst case
+    retrieve: O(1) on average, O(n) as worst case
+    remove: O(1) on avaerage, O(n) as worst case
  */
 
 
