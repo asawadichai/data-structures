@@ -1,16 +1,3 @@
-/*inserting order 5, 2, 3, 7, 6
-
-root        {value: 5, left: 2, right: 7}
-level 1 {value: 2, left: null, right:3} {value: 7, left: 6, right: null}
-level 2 {value: 3, left: null, right:null} {value: 6, left:null, right:null}
-
-*/
-
-/*
-  each node needs property : value, left, right
-  contructor contains: methods, root
-*/
-
 var BinarySearchTree = function(value) {
   this.value = value;
   this.left = null;
